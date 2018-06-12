@@ -690,6 +690,9 @@ def helptranslate():
     return helpTranslate
 
 def clientBot(op):
+    global time
+    global ast
+    global groupParam
     try:
         if op.type == 0:
             print ("[ 0 ] END OF OPERATION")
@@ -2359,7 +2362,7 @@ def clientBot(op):
         logError(error)
         traceback.print_tb(error.__traceback__)
 
-	if op.type == 26:
+        if op.type == 26:
             msg = op.message
             text = msg.text
             msg_id = msg.id
