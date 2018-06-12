@@ -2377,13 +2377,13 @@ def clientBot(op):
 	
 while True:
     try:
-	autoRestart()
+        autoRestart()
         delete_log()
         ops = clientPoll.singleTrace(count=50)
         if ops is not None:
             for op in ops:
                 #clientBot(op)
-		clientPoll.setRevision(op.revision)
+                clientPoll.setRevision(op.revision)
                 thread1 = threading.Thread(target=clientBot, args=(op,))#self.OpInterrupt[op.type], args=(op,)
                 #thread1.daemon = True
                 thread1.start()
