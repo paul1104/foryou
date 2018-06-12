@@ -15,17 +15,14 @@ import time, random, asyncio, timeit, sys, json, codecs, threading, glob, re, st
 #client = LINE("EtUQyajTlpnIoMkTFdGb.ggNCLqZ5irfKOvdzgQfq2W.daEMv5yOzXy11chHENcvKk++Gf9eed16v8ezZEqOx+U=")
 client = LINE()
 clientMid = client.profile.mid
+settingsOpen = codecs.open("kaneki.json","r","utf-8")
 clientProfile = client.getProfile()
 clientSettings = client.getSettings()
 clientPoll = OEPoll(client)
 botStart = time.time()
+settings = json.load(settingsOpen)
 
 msg_dict={}
-settingsOpen = codecs.open("kaneki.json","r","utf-8")
-
-settings = json.load(settingsOpen)
-if settings["restartPoint"] != None:
-    client.sendMessage(settings["restartPoint"], "Bot kembali aktif")
 
 helpmess = """╔══『 Menu Kaneki 』
 ╠ ⌬ 「/siders」
@@ -192,8 +189,37 @@ settings = {
         "target": {}
     },
     "setKey": False,
-    "unsendMessage": False
+    "unsendMessage": False,
+    "restartPoint": null,
+    "server": "VPS",
+    "target": {},
+    "timeRestart": "18000",
+    "userAgent": [
+        "Mozilla/5.0 (X11; U; Linux i586; de; rv:5.0) Gecko/20100101 Firefox/5.0",
+        "Mozilla/5.0 (X11; U; Linux amd64; rv:5.0) Gecko/20100101 Firefox/5.0 (Debian)",
+        "Mozilla/5.0 (X11; U; Linux amd64; en-US; rv:5.0) Gecko/20110619 Firefox/5.0",
+        "Mozilla/5.0 (X11; Linux) Gecko Firefox/5.0",
+        "Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0 FirePHP/0.5",
+        "Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0 Firefox/5.0",
+        "Mozilla/5.0 (X11; Linux x86_64) Gecko Firefox/5.0",
+        "Mozilla/5.0 (X11; Linux ppc; rv:5.0) Gecko/20100101 Firefox/5.0",
+        "Mozilla/5.0 (X11; Linux AMD64) Gecko Firefox/5.0",
+        "Mozilla/5.0 (X11; FreeBSD amd64; rv:5.0) Gecko/20100101 Firefox/5.0",
+        "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0",
+        "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:5.0) Gecko/20110619 Firefox/5.0",
+        "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:5.0) Gecko/20100101 Firefox/5.0",
+        "Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20100101 Firefox/5.0",
+        "Mozilla/5.0 (Windows NT 6.1.1; rv:5.0) Gecko/20100101 Firefox/5.0",
+        "Mozilla/5.0 (Windows NT 5.2; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0",
+        "Mozilla/5.0 (Windows NT 5.1; U; rv:5.0) Gecko/20100101 Firefox/5.0",
+        "Mozilla/5.0 (Windows NT 5.1; rv:2.0.1) Gecko/20100101 Firefox/5.0",
+        "Mozilla/5.0 (Windows NT 5.0; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0",
+        "Mozilla/5.0 (Windows NT 5.0; rv:5.0) Gecko/20100101 Firefox/5.0"
+    ]
 }
+
+if settings["restartPoint"] != None:
+    client.sendMessage(settings["restartPoint"], "Bot kembali aktif")
 
 read = {
     "ROM": {},
