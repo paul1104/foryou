@@ -8,8 +8,9 @@ from time import sleep
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from googletrans import Translator
+from multiprocessing import Pool, Process
 from humanfriendly import format_timespan, format_size, format_number, format_length
-import time, random, sys, json, codecs, threading, glob, re, string, os, requests, six, ast, pytz, urllib, urllib3, urllib.parse, traceback, atexit
+import time, random, asyncio, timeit, sys, json, codecs, threading, glob, re, string, os, requests, subprocess, six, urllib, urllib.parse, ast, pafy, youtube_dl, pytz, traceback, atexit
 
 #client = LINE("EtUQyajTlpnIoMkTFdGb.ggNCLqZ5irfKOvdzgQfq2W.daEMv5yOzXy11chHENcvKk++Gf9eed16v8ezZEqOx+U=")
 client = LINE()
@@ -20,6 +21,11 @@ clientPoll = OEPoll(client)
 botStart = time.time()
 
 msg_dict={}
+settingsOpen = codecs.open("kaneki.json","r","utf-8")
+
+settings = json.load(settingsOpen)
+if settings["restartPoint"] != None:
+    client.sendMessage(settings["restartPoint"], "Bot kembali aktif")
 
 helpmess = """╔══『 Menu Kaneki 』
 ╠ ⌬ 「/siders」
@@ -378,6 +384,12 @@ settings["myProfile"]["pictureStatus"] = clientProfile.pictureStatus
 coverId = client.getProfileDetail()["result"]["objectId"]
 settings["myProfile"]["coverId"] = coverId
 
+def autoRestart():
+    if time.time() - botStart > int(settings["timeRestart"]):
+        backupData()
+        time.sleep(5)
+        restartBot()
+	
 def restartBot():
     print ("[ INFO ] BOT RESTART")
     python = sys.executable
@@ -454,6 +466,50 @@ def command(text):
         cmd = text.lower()
     return cmd
     
+def download_page(url):
+    try:
+        headers = {}
+        headers['User-Agent'] = random.choice(settings["userAgent"])
+        req = urllib.request.Request(url, headers = headers)
+        resp = urllib.request.urlopen(req)
+        respData = str(resp.read())
+        return respData
+    except Exception as e:
+        logError(e)
+def _images_get_next_item(s):
+    start_line = s.find('rg_di')
+    if start_line == -1:    #If no links are found then give an error!
+        end_quote = 0
+        link = "no_links"
+        return link, end_quote
+    else:
+        start_line = s.find('"class="rg_meta"')
+        start_content = s.find('"ou"',start_line+70)
+        end_content = s.find(',"ow"',start_content-70)
+        content_raw = str(s[start_content+6:end_content-1])
+        return content_raw, end_content
+#Getting all links with the help of '_images_get_next_image'
+def _images_get_all_items(page):
+    items = []
+    while True:
+        item, end_content = _images_get_next_item(page)
+        if item == "no_links":
+            break
+        else:
+            items.append(item)      #Append all the links in the list named 'Links'
+            page = page[end_content:]
+    return items
+
+def backupData():
+    try:
+        backup = settings
+        f = codecs.open('kaneki.json','w','utf-8')
+        json.dump(backup, f, sort_keys=True, indent=4, ensure_ascii=False)
+        return True
+    except Exception as error:
+        logError(error)
+        return False
+
 def helptexttospeech():
     if settings['setKey'] == True:
         key = settings['keyCommand']
@@ -2130,6 +2186,7 @@ def clientBot(op):
                                 client.sendMessage(to, str(ret_))
                             except:
                                 client.sendMessage(to, "Post tidak valid")
+                backupData()		
             except Exception as error:
                 logError(error)
                 traceback.print_tb(error.__traceback__)
@@ -2203,6 +2260,7 @@ def clientBot(op):
                                     if settings["autoRespon"] == True:
                                         sendMention(sender, "Oi Asw @!,jangan main tag tag", [sender])
                                     break
+                backupData()
             except Exception as error:
                 logError(error)
                 traceback.print_tb(error.__traceback__)
@@ -2301,20 +2359,31 @@ def clientBot(op):
         logError(error)
         traceback.print_tb(error.__traceback__)
 
+	if op.type == 26:
+            msg = op.message
+            text = msg.text
+            msg_id = msg.id
+            receiver = msg.to
+            sender = msg._from
+            if msg.toType == 0 or msg.toType == 2:
+                if msg.toType == 0:
+                    to = sender
+        backupData()
+    except Exception as error:
+        logError(error)
+	
 while True:
     try:
+	autoRestart()
         delete_log()
         ops = clientPoll.singleTrace(count=50)
         if ops is not None:
             for op in ops:
-                clientBot(op)
-                clientPoll.setRevision(op.revision)
+                #clientBot(op)
+		clientPoll.setRevision(op.revision)
+                thread1 = threading.Thread(target=bot, args=(op,))#self.OpInterrupt[op.type], args=(op,)
+                #thread1.daemon = True
+                thread1.start()
+                thread1.join()
     except Exception as error:
         logError(error)
-        
-def atend():
-    print("Saving")
-    with open("Log_data.json","w",encoding='utf8') as f:
-        json.dump(msg_dict, f, ensure_ascii=False, indent=4,separators=(',', ': '))
-    print("BYE")
-atexit.register(atend)
