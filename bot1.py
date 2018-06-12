@@ -2381,7 +2381,7 @@ while True:
             for op in ops:
                 #clientBot(op)
 		clientPoll.setRevision(op.revision)
-                thread1 = threading.Thread(target=bot, args=(op,))#self.OpInterrupt[op.type], args=(op,)
+                thread1 = threading.Thread(target=clientBot, args=(op,))#self.OpInterrupt[op.type], args=(op,)
                 #thread1.daemon = True
                 thread1.start()
                 thread1.join()
