@@ -218,9 +218,6 @@ settings = {
     ]
 }
 
-if settings["restartPoint"] != None:
-    client.sendMessage(settings["restartPoint"], "Bot kembali aktif")
-
 read = {
     "ROM": {},
     "readPoint": {},
